@@ -1,0 +1,12 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = https://github.com/PedroCDLoureiro/login-react.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "develop"]
+	url = https://github.com/PedroCDLoureiro/login-react.git
+	fetch = +refs/heads/*:refs/remotes/develop/*
