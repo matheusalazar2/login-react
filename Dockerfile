@@ -1,18 +1,32 @@
-# Use a imagem de base adequada para a aplicação web (por exemplo, node para Node.js, python para Python, etc.)
-FROM node:alpine
+# Stage 1: Build the React application
+FROM node:16 AS builder
 
-# Defina o diretório de trabalho na imagem Docker
+# Set working directory
 WORKDIR /app
 
-# Copie os arquivos necessários para o contêiner Docker
+# Copy package.json and package-lock.json
 COPY package*.json ./
-COPY . .
 
-# Instale as dependências da aplicação
+# Install dependencies
 RUN npm install
 
-# Expõe a porta necessária pela aplicação web
-EXPOSE 3000
+# Copy the rest of your app's source code
+COPY . .
 
-# Comando para iniciar a aplicação
-CMD ["npm", "start"]
+# Build the application
+RUN npm run build
+
+# Stage 2: Serve the app with nginx
+FROM nginx:alpine
+
+# Set working directory to nginx asset directory
+WORKDIR /usr/share/nginx/html
+
+# Remove default nginx static assets
+RUN rm -rf ./*
+
+# Copy static assets from builder stage
+COPY --from=builder /app/build .
+
+# Containers run nginx with global directives and daemon off
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
