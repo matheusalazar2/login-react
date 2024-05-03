@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Build Docker image
+      run: docker build -t yourdockerhubusername/yourappname .
+      
+    - name: Push Docker image to Docker Hub
+      run: docker push yourdockerhubusername/yourappname
+
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Pull Docker image from Docker Hub
+      run: docker pull yourdockerhubusername/yourappname
+      
+    - name: Run security test (replace with SAST or DAST command)
+      run: echo "Running security test..."
+      
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Install ngrok
+      run: |
+        wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+        unzip ngrok-stable-linux-amd64.zip
+      
+    - name: Start ngrok
+      run: ./ngrok http 3000 &
+
+    - name: Get ngrok public URL
+      id: ngrok
+      run: echo "::set-output name=url::$(curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)"
+      
+    - name: Notify on Telegram or Discord
+      run: |
+        curl -X POST -H 'Content-Type: application/json' -d '{"message": "New feature deployed! Check it out at ${{ steps.ngrok.outputs.url }}"}' your_telegram_or_discord_webhook_url
