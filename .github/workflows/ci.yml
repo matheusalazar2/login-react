@@ -14,10 +14,10 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Build Docker image
-      run: docker build -t yourdockerhubusername/yourappname .
+      run: docker build -t react_login .
       
     - name: Push Docker image to Docker Hub
-      run: docker push yourdockerhubusername/yourappname
+      run: docker run -p 80:80 react_login
 
   test:
     runs-on: ubuntu-latest
