@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useState } from "react";
 import "./MyForm.css";
 
@@ -45,5 +46,12 @@ const MyForm = ({ user }) => {
         </div>
     );
 };
+
+MyForm.propTypes = {
+    user: PropTypes.shape({
+        email: PropTypes.string.isRequired,
+        senha: PropTypes.string.isRequired,
+    }),
+}
 
 export default MyForm;
