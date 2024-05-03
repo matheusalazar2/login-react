@@ -14,10 +14,10 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Build Docker image
-      run: docker build -t react_login .
+      run: docker build -t login-react .
       
     - name: Push Docker image to Docker Hub
-      run: docker run -p 80:80 react_login
+      run: docker run -p 80:80 login-react
 
   test:
     runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Pull Docker image from Docker Hub
-      run: docker pull yourdockerhubusername/yourappname
+      run: docker pull login-react
       
     - name: Run security test (replace with SAST or DAST command)
       run: echo "Running security test..."
