@@ -53,6 +53,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+    
+    - name: Run Docker Container
+      run: docker run -d -p 3000:80 salazator/login-react
       
     - name: Start ngrok
       run: |
