@@ -16,17 +16,17 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# # Stage 2: Serve the app with nginx
-# FROM nginx:alpine
+# Stage 2: Serve the app with nginx
+FROM nginx:alpine
 
-# # Set working directory to nginx asset directory
-# WORKDIR /usr/share/nginx/html
+# Set working directory to nginx asset directory
+WORKDIR /usr/share/nginx/html
 
-# # Remove default nginx static assets
-# RUN rm -rf ./*
+# Remove default nginx static assets
+RUN rm -rf ./*
 
-# # Copy static assets from builder stage
-# COPY --from=builder /app/build .
+# Copy static assets from builder stage
+COPY --from=builder /app/build .
 
-# # Containers run nginx with global directives and daemon off
-# ENTRYPOINT ["nginx", "-g", "daemon off;"]
+# Containers run nginx with global directives and daemon off
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
