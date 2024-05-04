@@ -17,7 +17,7 @@ jobs:
       run: docker build -t login-react .
       
     - name: Push Docker image to Docker Hub
-      run: docker run -p 80:80 login-react
+      run: docker push login-react
 
   test:
     runs-on: ubuntu-latest

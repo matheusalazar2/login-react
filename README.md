@@ -8,9 +8,9 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
 ## CheckList da Somativa 2
-[x] - criacao de pipeline
-[] - hospedar a aplicacao no docker hub
-[] - utilizar SAST ou DAST como teste de seguranca
-[x] - enviar notificacao para o telegram ou discord
-[x] - criacao de um pipe com as fases de build, test e deploy
-[] - configuracao do ngrok
+- [x] criacao de pipeline
+- [ ] hospedar a aplicacao no docker hub
+- [ ] utilizar SAST ou DAST como teste de seguranca
+- [x] enviar notificacao para o telegram ou discord
+- [x] criacao de um pipe com as fases de build, test e deploy
+- [ ] configuracao do ngrok
