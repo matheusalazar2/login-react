@@ -51,19 +51,30 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      
-    - name: Install ngrok
+    
+    - name: Start Application
       run: |
-        wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-        unzip ngrok-stable-linux-amd64.zip
+        npm run dev
       
     - name: Start ngrok
-      run: ./ngrok http 3000 &
+      run: |
+        curl -s https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip -o ngrok.zip
+          unzip ngrok.zip
+          ./ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+          ./ngrok http 8000 > /dev/null &
+          sleep 10 # Aguardar o ngrok estabelecer a conexão
+          curl --silent http://localhost:4040/api/tunnels | jq .tunnels[0].public_url
 
-    - name: Get ngrok public URL
-      id: ngrok
-      run: echo "::set-output name=url::$(curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)"
+    - name: Use ngrok public URL
+      id: ngrok_url
+      run: |
+        echo "::set-output name=url::$(curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)"
+
+    - name: Display ngrok URL
+      run: |
+        echo "Ngrok URL is ${{ steps.ngrok_url.outputs.url }}"
+
       
     - name: Notify on Discord
       run: |
-        curl -X POST -H 'Content-Type: application/json' -d '{ "content": "New feature deployed! Check it out at ${{ steps.ngrok.outputs.url }}"}' https://discord.com/api/webhooks/1236109483659362395/dJCe2paGroyrsrNt5TvMVjmiVQM9Ty2kk-QUb5KXm1F666QSNMdEwuz-y67tJqlF0Sfu
+        curl -X POST -H 'Content-Type: application/json' -d '{ "content": "New feature deployed! Check it out at ${{ steps.ngrok_url.outputs.url }}"}' https://discord.com/api/webhooks/1236109483659362395/dJCe2paGroyrsrNt5TvMVjmiVQM9Ty2kk-QUb5KXm1F666QSNMdEwuz-y67tJqlF0Sfu
