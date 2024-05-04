@@ -59,9 +59,8 @@ jobs:
       
     - name: Download and Install Ngrok
       run: |
-        curl -s https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip -o ngrok.zip
+        curl -s https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip -o ngrok.zip
           unzip ngrok.zip
-          ./ngrok update
     
     - name: Setup Ngrok
       env: 
