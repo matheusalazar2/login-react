@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Check if build directory exists
-RUN ls -la .
+RUN ls -la /app/dist
 
 # Stage 2: Serve the app with nginx
 FROM nginx:alpine
@@ -29,7 +29,7 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 # Copy static assets from builder stage
-COPY --from=builder /app/build .
+COPY --from=builder /app/dist .
 
 # Containers run nginx with global directives and daemon off
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
