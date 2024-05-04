@@ -16,6 +16,9 @@ COPY . .
 # Build the application
 RUN npm run build
 
+# Check if build directory exists
+RUN ls -la .
+
 # Stage 2: Serve the app with nginx
 FROM nginx:alpine
 
