@@ -41,12 +41,12 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
       with:
         languages: 'javascript'
 
     - name: Perform CodeQL Analysis
-      run: github/codeql-action/analyze@v1
+      run: github/codeql-action/analyze@v2
       
   deploy:
     needs: test
