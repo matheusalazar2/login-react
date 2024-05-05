@@ -1,16 +1,16 @@
-name: CI
+name: CI/CD
 
 on:
-  pull_request:
-    branches:
-      - master
+  branches:
+    - master
+    - test-deploy
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout repository
+    - name: Checkout Repository
       uses: actions/checkout@v2
     
     - name: Log in to Docker Hub
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout repository
+    - name: Checkout Repository
       uses: actions/checkout@v2
       
     - name: Pull Docker image from Docker Hub
@@ -51,29 +51,21 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    
-    - name: Run Docker Container
-      run: docker run -d -p 3000:80 salazator/login-react
+      - name: Checkout Repository
+        uses: actions/checkout@v2
       
-    - name: Download and Install Ngrok
-      run: |
-        curl -s https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip -o ngrok.zip
-          unzip ngrok.zip
-    
-    - name: Setup Ngrok
-      env: 
-        NGROK_AUTH_TOKEN : ${{ secrets.NGROK_AUTH_TOKEN }}
-      run: ./ngrok authtoken $NGROK_AUTH_TOKEN
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
 
-    - name: Start Ngrok
-      id: start_ngrok
-      run: |
-        ./ngrok http 3000 &
-        sleep 10 # Wait for ngrok to start and print public url
-        echo "::set-output name=url::$(curl --silent http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)"
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
       
     - name: Notify on Discord
       run: |
-        curl -X POST -H 'Content-Type: application/json' -d '{ "content": "New feature deployed! Check it out at ${{ steps.start_ngrok.outputs.url }}"}' https://discord.com/api/webhooks/1236109483659362395/dJCe2paGroyrsrNt5TvMVjmiVQM9Ty2kk-QUb5KXm1F666QSNMdEwuz-y67tJqlF0Sfu
+        curl -X POST -H 'Content-Type: application/json' -d '{ "content": "New feature deployed! Check it out at https://login-react-rust.vercel.app/"}' https://discord.com/api/webhooks/1236109483659362395/dJCe2paGroyrsrNt5TvMVjmiVQM9Ty2kk-QUb5KXm1F666QSNMdEwuz-y67tJqlF0Sfu
