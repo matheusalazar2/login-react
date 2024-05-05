@@ -40,11 +40,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
       
-    - name: Pull Docker image from Docker Hub
-      run: docker pull salazator/login-react
-      
-    - name: Run security test (replace with SAST or DAST command)
-      run: echo "Running security test..."
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: 'javascript'
+
+    - name: Perform CodeQL Analysis
+      run: github/codeql-action/analyze@v1
       
   deploy:
     needs: test
@@ -64,8 +66,9 @@ jobs:
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Project Artifacts to Vercel
+        id: vercel-deploy
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
       
       - name: Notify on Discord
         run: |
-          curl -X POST -H 'Content-Type: application/json' -d '{ "content": "New feature deployed! Check it out at https://login-react-rust.vercel.app/"}' https://discord.com/api/webhooks/1236109483659362395/dJCe2paGroyrsrNt5TvMVjmiVQM9Ty2kk-QUb5KXm1F666QSNMdEwuz-y67tJqlF0Sfu
+          curl -X POST -H 'Content-Type: application/json' -d '{ "content": "New feature deployed! Check it out at ${{steps.vercel-deploy.outputs.url }} "}' https://discord.com/api/webhooks/1236109483659362395/dJCe2paGroyrsrNt5TvMVjmiVQM9Ty2kk-QUb5KXm1F666QSNMdEwuz-y67tJqlF0Sfu
