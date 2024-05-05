@@ -41,19 +41,19 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: 'javascript'
 
     - name: Perform CodeQL Analysis
-      run: github/codeql-action/analyze@v2
+      run: github/codeql-action/analyze@v3
       
   deploy:
     needs: test
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v2
       
       - name: Install Vercel CLI
