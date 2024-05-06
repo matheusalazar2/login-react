@@ -1,6 +1,9 @@
 name: CI
 
 on:
+  push: 
+    branches:
+      - master
   pull_request:
     branches:
       - master
@@ -36,44 +39,64 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - language: javascript-typescript
+          build-mode: none
+
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       
-    - name: Pull Docker image from Docker Hub
-      run: docker pull salazator/login-react
-      
-    - name: Run security test (replace with SAST or DAST command)
-      run: echo "Running security test..."
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: ${{ matrix.build-mode }}
+
+    - if: matrix.build-mode == 'manual'
+      run: |
+        echo 'If you are using a "manual" build mode for one or more of the' \
+          'languages you are analyzing, replace this with the commands to build' \
+          'your code, for example:'
+        echo '  make bootstrap'
+        echo '  make release'
+        exit 1
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
       
   deploy:
     needs: test
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    
-    - name: Run Docker Container
-      run: docker run -d -p 3000:80 salazator/login-react
+      - name: Checkout repository
+        uses: actions/checkout@v2
       
-    - name: Download and Install Ngrok
-      run: |
-        curl -s https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip -o ngrok.zip
-          unzip ngrok.zip
-    
-    - name: Setup Ngrok
-      env: 
-        NGROK_AUTH_TOKEN : ${{ secrets.NGROK_AUTH_TOKEN }}
-      run: ./ngrok authtoken $NGROK_AUTH_TOKEN
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
 
-    - name: Start Ngrok
-      id: start_ngrok
-      run: |
-        ./ngrok http 3000 &
-        sleep 10 # Wait for ngrok to start and print public url
-        echo "::set-output name=url::$(curl --silent http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)"
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        id: vercel-deploy
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
       
-    - name: Notify on Discord
-      run: |
-        curl -X POST -H 'Content-Type: application/json' -d '{ "content": "New feature deployed! Check it out at ${{ steps.start_ngrok.outputs.url }}"}' https://discord.com/api/webhooks/1236109483659362395/dJCe2paGroyrsrNt5TvMVjmiVQM9Ty2kk-QUb5KXm1F666QSNMdEwuz-y67tJqlF0Sfu
+      - name: Notify on Discord
+        run: |
+          curl -X POST -H 'Content-Type: application/json' -d '{ "content": "New feature deployed! Check it out at https://github.com/matheusalazar2/login-react "}' https://discord.com/api/webhooks/1236109483659362395/dJCe2paGroyrsrNt5TvMVjmiVQM9Ty2kk-QUb5KXm1F666QSNMdEwuz-y67tJqlF0Sfu
