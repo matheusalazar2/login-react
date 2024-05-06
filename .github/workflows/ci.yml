@@ -99,4 +99,4 @@ jobs:
       
       - name: Notify on Discord
         run: |
-          curl -X POST -H 'Content-Type: application/json' -d '{ "content": "New feature deployed! Check it out at ${{steps.vercel-deploy.outputs }} "}' https://discord.com/api/webhooks/1236109483659362395/dJCe2paGroyrsrNt5TvMVjmiVQM9Ty2kk-QUb5KXm1F666QSNMdEwuz-y67tJqlF0Sfu
+          curl -X POST -H 'Content-Type: application/json' -d '{ "content": "New feature deployed! Check it out at ${{steps.vercel-deploy.outputs.Production }} "}' https://discord.com/api/webhooks/1236109483659362395/dJCe2paGroyrsrNt5TvMVjmiVQM9Ty2kk-QUb5KXm1F666QSNMdEwuz-y67tJqlF0Sfu
